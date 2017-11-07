@@ -1,0 +1,67 @@
+2017-11-07T10:11:18.399Z - normal: Load ~/.CocosCreator/settings.json
+2017-11-07T10:11:18.404Z - normal: checking language setting...
+2017-11-07T10:11:18.404Z - normal: Language: zh
+2017-11-07T10:11:20.515Z - success: protocol editor-framework registered
+2017-11-07T10:11:20.515Z - success: protocol app registered
+2017-11-07T10:11:20.515Z - success: protocol theme registered
+2017-11-07T10:11:20.515Z - success: protocol packages registered
+2017-11-07T10:11:20.515Z - success: protocol unpack registerred
+2017-11-07T10:11:20.516Z - success: protocol disable-commonjs registerred
+2017-11-07T10:11:20.726Z - normal: connected!
+2017-11-07T10:11:20.728Z - normal: Check project C:\project\cocos-cretor-bugly-plugin
+2017-11-07T10:11:20.731Z - normal: Initializing Cocos2d
+2017-11-07T10:11:21.022Z - normal: Initializing Asset Database
+2017-11-07T10:11:21.077Z - success: protocol uuid registerred
+2017-11-07T10:11:21.078Z - success: protocol db registerred
+2017-11-07T10:11:21.078Z - success: protocol thumbnail registerred
+2017-11-07T10:11:21.078Z - normal: Loading editor/builtin packages
+2017-11-07T10:11:21.102Z - success: anysdk loaded
+2017-11-07T10:11:21.266Z - success: assets loaded
+2017-11-07T10:11:21.268Z - success: builder loaded
+2017-11-07T10:11:21.271Z - success: cocos-analytics loaded
+2017-11-07T10:11:21.275Z - success: console loaded
+2017-11-07T10:11:21.279Z - success: hierarchy loaded
+2017-11-07T10:11:21.283Z - success: inspector loaded
+2017-11-07T10:11:21.285Z - success: keystore loaded
+2017-11-07T10:11:21.288Z - success: node-library loaded
+2017-11-07T10:11:21.290Z - success: package-asset loaded
+2017-11-07T10:11:21.293Z - success: preferences loaded
+2017-11-07T10:11:21.295Z - success: project-exporter loaded
+2017-11-07T10:11:21.316Z - success: project-importer loaded
+2017-11-07T10:11:21.319Z - success: project-settings loaded
+2017-11-07T10:11:21.327Z - success: ui-kit loaded
+2017-11-07T10:11:21.333Z - success: ui-grid loaded
+2017-11-07T10:11:21.338Z - success: scene loaded
+2017-11-07T10:11:21.339Z - success: sprite-editor loaded
+2017-11-07T10:11:21.348Z - success: store loaded
+2017-11-07T10:11:21.354Z - success: timeline loaded
+2017-11-07T10:11:21.354Z - normal: Loading builtin packages
+2017-11-07T10:11:21.358Z - success: asset-db-debugger loaded
+2017-11-07T10:11:21.360Z - success: code-editor loaded
+2017-11-07T10:11:21.361Z - success: color-picker loaded
+2017-11-07T10:11:21.363Z - error: Failed to add menu to 面板,
+          a menu item 面板/控制台 you tried to add already exists
+    at Menu.add (C:\CocosCreator_v1.7.0-beta.5_20171027_win\CocosCreator\resources\app.asar\editor-framework\lib\main\menu.js:1:4597)
+    at Object.MainMenu.add (C:\CocosCreator_v1.7.0-beta.5_20171027_win\CocosCreator\resources\app.asar\editor-framework\lib\main\main-menu.js:1:4273)
+    at Async.series.a (C:\CocosCreator_v1.7.0-beta.5_20171027_win\CocosCreator\resources\app.asar\editor-framework\lib\main\package.js:1:2770)
+    at C:\CocosCreator_v1.7.0-beta.5_20171027_win\CocosCreator\resources\app.asar\node_modules\async\lib\async.js:718:13
+    at Immediate.iterate (C:\CocosCreator_v1.7.0-beta.5_20171027_win\CocosCreator\resources\app.asar\node_modules\async\lib\async.js:262:13)
+    at runCallback (timers.js:672:20)
+    at tryOnImmediate (timers.js:645:5)
+    at processImmediate [as _immediateCallback] (timers.js:617:5)
+2017-11-07T10:11:21.364Z - failed: Failed to load panel "panel" from "console", the panelID console already exists
+2017-11-07T10:11:21.365Z - success: console loaded
+2017-11-07T10:11:21.367Z - success: package-manager loaded
+2017-11-07T10:11:21.373Z - success: sdkbox loaded
+2017-11-07T10:11:21.376Z - success: tester loaded
+2017-11-07T10:11:21.378Z - success: ui-kit-preview-extra loaded
+2017-11-07T10:11:21.381Z - success: ui-kit-preview loaded
+2017-11-07T10:11:21.383Z - success: ui-tree loaded
+2017-11-07T10:11:22.886Z - normal: Initializing project C:\project\cocos-cretor-bugly-plugin
+2017-11-07T10:11:22.892Z - normal: Loading packages
+2017-11-07T10:11:22.901Z - success: plugin-bugly loaded
+2017-11-07T10:11:22.901Z - normal: Watching packages
+2017-11-07T10:11:22.955Z - normal: Run Application
+2017-11-07T10:11:29.952Z - success: preview server running at http://localhost:7456
+2017-11-07T10:11:35.789Z - normal: 1.6.0
+2017-11-07T10:12:02.830Z - info: shutdown preview server
