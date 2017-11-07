@@ -1,0 +1,19 @@
+<div class="layout vertical" style="width: 100%;height: 100%">
+    <!--<ui-button id="btn">Send To Main</ui-button>-->
+    <div class="layout vertical start-justified">
+
+        <ui-prop name="Game ID">
+            <div class="layout horizontal center flex-1 ">
+                <ui-input class="flex-1" v-value="gameID" v-on:blur="onChangeGameID"></ui-input>
+            </div>
+        </ui-prop>
+
+
+        <div class="self-end layout center horizontal">
+            <ui-button class="self-end red" v-on:confirm="onAddBuglySdk">添加</ui-button>
+        </div>
+        <h2>日志:</h2>
+        <textarea class="" id="logTextArea" v-value="logView" @contextmenu="onLogViewMenu"
+                  style="width: 100%; height: 200px; background: #252525;	color: #fd942b;	border-color: #fd942b;"></textarea>
+    </div>
+</div>
