@@ -14,7 +14,6 @@
     "type": "dockable",
     "title": "plugin-bugly",
     "width": 400,
-    "height": 340,
-    "max-height":340
+    "height": 340
   }
 }

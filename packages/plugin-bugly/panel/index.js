@@ -3,6 +3,7 @@ var PATH = require('fire-path');
 var CfgUtil = Editor.require("packages://plugin-bugly/core/CfgUtil");
 var fse = require('fs-extra');
 var rimraf = require('rimraf');
+var Electron = require('electron');
 
 Editor.Panel.extend({
     style: FS.readFileSync(Editor.url('packages://plugin-bugly/panel/index.html', 'utf8')) + "",
@@ -10,6 +11,7 @@ Editor.Panel.extend({
 
     $: {
         logTextArea: '#logTextArea',
+        uploadBtn: '#uploadBtn',
     },
 
     ready() {
@@ -19,6 +21,11 @@ Editor.Panel.extend({
                 logCtrl.scrollTop = logCtrl.scrollHeight;
             }, 10);
         };
+        let uploadBtn = this.$uploadBtn;
+        let setUploadBtnDisabled = function (b) {
+            uploadBtn.disabled = b;
+        };
+
 
         window.plugin = new window.Vue({
             el: this.shadowRoot,
@@ -27,10 +34,16 @@ Editor.Panel.extend({
                 this.initPlugin();
             },
             data: {
-                gameID: "",
                 preGameID: "",
+                gameID: "",
+                gameKey: "",
+                gamePackage: "com.game.test",
+                gameVersion: "1.0",
+                channal: "",
                 logView: [],
-
+                isShowFreshAppPackage: true,
+                isShowOutPutFileFilePath: false,
+                outPutFilePath: "",// 符号保存位置
             },
             methods: {
                 _addLog(str) {
@@ -42,16 +55,57 @@ Editor.Panel.extend({
                 initPlugin() {
                     CfgUtil.initCfg(function (data) {
                         if (data) {
-                            console.log(data);
+                            // console.log(data);
                             this.gameID = data.gameID;
+                            this.gameKey = data.gameKey;
+                            this.gameVersion = data.gameVersion;
+                            this.channal = data.channal;
                         }
-                    }.bind(this))
+                    }.bind(this));
+                    // 包名
+                    this.updateGamePackageName();
+                },
+                // 更新游戏包名
+                updateGamePackageName() {
+                    let projectPath = Editor.projectInfo.path;
+                    let buildCfg = PATH.join(projectPath, "settings/builder.json");
+                    if (!FS.existsSync(buildCfg)) {
+                        this.gamePackage = null;
+                    } else {
+                        function setGamePackage() {
+                            let data = FS.readFileSync(buildCfg, 'utf-8');
+                            let buildData = null;
+                            try {
+                                buildData = JSON.parse(data);
+                            } catch (e) {
+                                console.log(e);
+                                buildData = null;
+                            }
+                            if (buildData) {
+                                if (buildData.packageName) {
+                                    this.gamePackage = buildData.packageName;
+                                } else {
+                                    this.gamePackage = null;
+                                }
+                            }
+                        }
+
+                        FS.unwatchFile(buildCfg);
+                        this.isShowFreshAppPackage = false;
+                        FS.watch(buildCfg, function (event, fileName) {
+                            console.log("event:%s, file:%s ", event, fileName);
+                            setGamePackage.apply(this);
+                        }.bind(this));
+                        setGamePackage.apply(this);
+                    }
                 },
                 onLogViewMenu(event) {
+                    console.log("onLogViewMenu");
                     Editor.Ipc.sendToMain('plugin-bugly:popup-create-menu', event.x, event.y, null);
                 },
                 onChangeGameID() {
                     let oldGameID = CfgUtil.getGameID();
+                    CfgUtil.setGameID(this.gameID);
                     if (oldGameID === this.gameID) {
                         return;
                     }
@@ -81,7 +135,96 @@ Editor.Panel.extend({
                             this._addLog("文件成功更新GameID: " + AppDelegateCppFilePath);
                         }
                     }
-                    CfgUtil.setGameID(this.gameID);
+                },
+                onSaveCfg() {
+                    CfgUtil.setGameKeyAndVersion(this.gameKey, this.gameVersion, this.channal);
+                },
+                //打开符号表文件
+                onOpenBuglySymbol() {
+                    if (!FS.existsSync(this.outPutFilePath)) {
+                        return;
+                    }
+                    Electron.shell.showItemInFolder(this.outPutFilePath);
+                    Electron.shell.beep();
+                },
+                // 上传符号表文件
+                onUploadBuglySymbol() {
+                    console.log("onUploadBuglySymbol");
+                    let projectPath = Editor.projectInfo.path;
+
+                    // 检测so文件
+                    let buildCfg = PATH.join(projectPath, "local/builder.json");
+                    if (!FS.existsSync(buildCfg)) {
+                        this._addLog("发现没有构建项目, 使用前请先构建项目!");
+                        return;
+                    }
+                    let data = FS.readFileSync(buildCfg, 'utf-8');
+                    let buildData = JSON.parse(data);
+                    let buildFullDir = PATH.join(projectPath, buildData.buildPath);
+                    let soPath = PATH.join(buildFullDir,
+                        "jsb-" + buildData.template + "/frameworks/runtime-src/proj.android-studio/app/libs/armeabi-v7a/libcocos2djs.so");
+
+                    if (!FS.existsSync(soPath)) {
+                        this._addLog("请编译项目, 没有发现so文件:" + soPath);
+                        return;
+                    }
+
+                    // 符号文件保存地址
+                    const {remote} = require('electron');
+                    let outPutDirPath = PATH.join(remote.app.getPath('userData'), "buglySymbolAndroid");
+                    if (!FS.existsSync(outPutDirPath)) {
+                        FS.mkdirSync(outPutDirPath);
+                    }
+                    let outPutFilePath = PATH.join(outPutDirPath, "buglySymbol.zip");
+                    if (FS.existsSync(outPutFilePath)) {
+                        FS.unlinkSync(outPutFilePath);
+                    }
+                    this.outPutFilePath = "";
+                    this.isShowOutPutFileFilePath = false;
+
+                    let jarPath = PATH.join(projectPath, "packages/plugin-bugly/buglySymbolAndroid/buglySymbolAndroid.jar");
+                    if (FS.existsSync(jarPath)) {
+                        setUploadBtnDisabled(true);
+
+                        let buglyCmd =
+                            "java -Xms512m -Xmx1024m -Dfile.encoding=UTF8 " +
+                            " -jar " + jarPath +
+                            " -i " + soPath +
+                            " -o " + "\"" + outPutFilePath + "\"" +
+                            // "-u " +
+                            " -id " + this.gameID +
+                            " -key " + this.gameKey +
+                            " -package " + this.gamePackage +
+                            " -version " + this.gameVersion +
+                            " -channel " + this.channal;
+
+                        // console.log(buglyCmd);
+                        let callFile = require('child_process');
+                        let ret = callFile.exec(buglyCmd, function (err, stdOut) {
+                            if (err) {
+                                this._addLog("[生成失败:] " + err);
+                                setUploadBtnDisabled(false);
+                            } else {
+                                // this._addLog(stdOut);
+                            }
+                        }.bind(this));
+
+                        ret.stdout.on('data', function (data) {
+                            if (data === ".") {
+
+                            } else {
+                                this._addLog(data.toString());
+                            }
+
+                            if (data.indexOf("Successfully zipped symtab file!") >= 0) {
+                                this._addLog("上传成功!");
+                                setUploadBtnDisabled(false);
+                                this.outPutFilePath = outPutFilePath;
+                                this.isShowOutPutFileFilePath = true;
+                            }
+                        }.bind(this));
+                    }
+
                 },
                 _checkIsBuildProject() {
                     let projectDir = path.join(Editor.assetdb.library, "../");
@@ -99,7 +242,9 @@ Editor.Panel.extend({
                     } else {
                     }
                 },
-
+                queryBuildOptions(a) {
+                    this.updateGamePackageName();
+                },
                 onAddBuglySdk() {
                     let projectPath = Editor.projectInfo.path;
                     let buildCfg = PATH.join(projectPath, "local/builder.json");
@@ -370,6 +515,10 @@ Editor.Panel.extend({
     messages: {
         'plugin-bugly:cleanLog'(event) {
             window.plugin.logView = [];
-        }
+        },
+        'plugin-bugly:queryBuildOptions'(event) {
+            window.plugin.queryBuildOptions(a);
+        },
+
     }
 });

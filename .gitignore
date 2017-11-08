@@ -1,2 +1,6 @@
 .idea/
 library/
+build/
+temp/
+settings/
+local/

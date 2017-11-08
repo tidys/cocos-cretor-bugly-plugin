@@ -4,20 +4,17 @@ const {remote} = require('electron');
 
 let self = module.exports = {
     cfgData: {
-        gameName: null,
-        gameID: null,
-        gameWidth: null,
-        gameHeight: null,
+        channal: "",
+        gameID: "",
+        gameVersion: null,
+        gameKey: null,
         isAutoAddSdk: false
     },
     setIsAutoAddSDK(b) {
         this.cfgData.isAutoAddSdk = b;
         this.saveConfig();
     },
-    setGameName(name) {
-        this.cfgData.gameName = name;
-        this.saveConfig();
-    },
+
     getGameID() {
         return this.cfgData.gameID;
     },
@@ -25,9 +22,11 @@ let self = module.exports = {
         this.cfgData.gameID = id;
         this.saveConfig();
     },
-    setGameSize(width, height) {
-        this.cfgData.gameWidth = width;
-        this.cfgData.gameHeight = height;
+
+    setGameKeyAndVersion(key, version, channal) {
+        this.cfgData.gameKey = key;
+        this.cfgData.gameVersion = version;
+        this.cfgData.channal = channal;
         this.saveConfig();
     },
 

@@ -24,7 +24,6 @@ module.exports = {
             Editor.log('Button clicked!');
         },
         'popup-create-menu'(event, x, y, data) {
-            // Editor.log("x:" + x);
             let electron = require('electron');
             let BrowserWindow = electron.BrowserWindow;
             let template = [
@@ -41,6 +40,9 @@ module.exports = {
             y = Math.floor(y);
             editorMenu.nativeMenu.popup(BrowserWindow.fromWebContents(event.sender), x, y);
             editorMenu.dispose();
+        },
+        'builder:query-build-options'(event){
+            Editor.Ipc.sendToPanel('plugin-bugly', 'plugin-bugly:queryBuildOptions', event);
         },
     },
 };
