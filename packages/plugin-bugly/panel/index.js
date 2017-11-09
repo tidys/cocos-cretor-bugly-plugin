@@ -44,12 +44,17 @@ Editor.Panel.extend({
                 isShowFreshAppPackage: true,
                 isShowOutPutFileFilePath: false,
                 outPutFilePath: "",// 符号保存位置
+                isAutoUpload: true,
             },
             methods: {
                 _addLog(str) {
                     let time = new Date();
                     // this.logView = "[" + time.toLocaleString() + "]: " + str + "\n" + this.logView;
                     this.logView += "[" + time.toLocaleString() + "]: " + str + "\n";
+                    logListScrollToBottom();
+                },
+                _addLogNoTime(data) {
+                    this.logView += data;
                     logListScrollToBottom();
                 },
                 initPlugin() {
@@ -60,6 +65,7 @@ Editor.Panel.extend({
                             this.gameKey = data.gameKey;
                             this.gameVersion = data.gameVersion;
                             this.channal = data.channal;
+                            this.isAutoUpload = data.isAutoUpload;
                         }
                     }.bind(this));
                     // 包名
@@ -136,6 +142,10 @@ Editor.Panel.extend({
                         }
                     }
                 },
+                onAutoUpload() {
+                    this.isAutoUpload = !this.isAutoUpload;
+                    CfgUtil.setIsAutoUpload(this.isAutoUpload);
+                },
                 onSaveCfg() {
                     CfgUtil.setGameKeyAndVersion(this.gameKey, this.gameVersion, this.channal);
                 },
@@ -150,6 +160,31 @@ Editor.Panel.extend({
                 // 上传符号表文件
                 onUploadBuglySymbol() {
                     console.log("onUploadBuglySymbol");
+
+                    if (!(this.gameID && this.gameID.length > 0)) {
+                        this._addLog("请填写AppId");
+                        return;
+                    }
+
+                    if (!(this.gameKey && this.gameKey.length > 0)) {
+                        this._addLog("请填写App Key");
+                        return;
+                    }
+                    if (!(this.gamePackage && this.gamePackage.length > 0)) {
+                        this._addLog("未发现包名, 请先构建安卓项目");
+                        return;
+                    }
+
+                    if (!(this.gameVersion && this.gameVersion.length > 0)) {
+                        this._addLog("请填写版本号");
+                        return;
+                    }
+                    if (!(this.channal && this.channal.length > 0)) {
+                        this._addLog("请填写channal");
+                        return;
+                    }
+
+
                     let projectPath = Editor.projectInfo.path;
 
                     // 检测so文件
@@ -191,13 +226,16 @@ Editor.Panel.extend({
                             " -jar " + jarPath +
                             " -i " + soPath +
                             " -o " + "\"" + outPutFilePath + "\"" +
-                            // "-u " +
                             " -id " + this.gameID +
                             " -key " + this.gameKey +
                             " -package " + this.gamePackage +
                             " -version " + this.gameVersion +
                             " -channel " + this.channal;
 
+                        if (this.isAutoUpload) {
+                            buglyCmd += " -u ";
+                        }
+                        this._addLog("\n[Jar Cmd] " + buglyCmd + "\n");
                         // console.log(buglyCmd);
                         let callFile = require('child_process');
                         let ret = callFile.exec(buglyCmd, function (err, stdOut) {
@@ -210,13 +248,27 @@ Editor.Panel.extend({
                         }.bind(this));
 
                         ret.stdout.on('data', function (data) {
-                            if (data === ".") {
+                            this._addLogNoTime(data);
 
-                            } else {
-                                this._addLog(data.toString());
-                            }
 
                             if (data.indexOf("Successfully zipped symtab file!") >= 0) {
+                                this._addLog("生成成功!");
+                                this.outPutFilePath = outPutFilePath;
+                                this.isShowOutPutFileFilePath = true;
+                                if (this.isAutoUpload) {
+                                    this._addLog("开始上传!");
+                                } else {
+                                    setUploadBtnDisabled(false);
+                                }
+                            }
+
+                            if (data.indexOf('Failed to upload symtab file') >= 0) {
+                                this._addLog("上传失败!");
+                                setUploadBtnDisabled(false);
+                                this.outPutFilePath = outPutFilePath;
+                                this.isShowOutPutFileFilePath = true;
+                            }
+                            if (data.indexOf('Successfully uploaded') >= 0) {
                                 this._addLog("上传成功!");
                                 setUploadBtnDisabled(false);
                                 this.outPutFilePath = outPutFilePath;
@@ -246,6 +298,11 @@ Editor.Panel.extend({
                     this.updateGamePackageName();
                 },
                 onAddBuglySdk() {
+                    if (!(this.gameID && this.gameID.length > 0)) {
+                        this._addLog("请填写App Id");
+                        return;
+                    }
+
                     let projectPath = Editor.projectInfo.path;
                     let buildCfg = PATH.join(projectPath, "local/builder.json");
                     if (!FS.existsSync(buildCfg)) {

@@ -8,10 +8,10 @@ let self = module.exports = {
         gameID: "",
         gameVersion: null,
         gameKey: null,
-        isAutoAddSdk: false
+        isAutoUpload: false
     },
-    setIsAutoAddSDK(b) {
-        this.cfgData.isAutoAddSdk = b;
+    setIsAutoUpload(b) {
+        this.cfgData.isAutoUpload = b;
         this.saveConfig();
     },
 
@@ -27,6 +27,7 @@ let self = module.exports = {
         this.cfgData.gameKey = key;
         this.cfgData.gameVersion = version;
         this.cfgData.channal = channal;
+
         this.saveConfig();
     },
 

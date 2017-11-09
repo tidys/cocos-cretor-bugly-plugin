@@ -9,10 +9,9 @@
         </ui-prop>
 
 
-        <div class="self-end layout center horizontal">
-            <ui-button class="self-end red" v-on:confirm="onAddBuglySdk">添加</ui-button>
-        </div>
-
+        <!--<div class="self-end layout center horizontal">-->
+            <!--<ui-button class="self-end red" v-on:confirm="onAddBuglySdk">添加Bugly</ui-button>-->
+        <!--</div>-->
 
         <ui-prop name="App Key">
             <div class="layout horizontal center flex-1 ">
@@ -38,16 +37,22 @@
         <ui-prop name="符号文件保存位置" v-if="isShowOutPutFileFilePath" tooltip="">
             <div class="layout horizontal center flex-1 ">
                 <ui-input class="flex-1" v-value="outPutFilePath" disabled readonly v-on:blur="onSaveCfg"></ui-input>
-                <ui-button   v-on:confirm="onOpenBuglySymbol">打开</ui-button>
+                <ui-button v-on:confirm="onOpenBuglySymbol">打开</ui-button>
             </div>
         </ui-prop>
+        <ui-prop name="自动上传符号表" tooltip="自动上传符号表到Bugly">
+            <div class="layout horizontal center flex-1 ">
+                <ui-checkbox v-bind:checked="isAutoUpload" v-on:change="onAutoUpload"></ui-checkbox>
 
+            </div>
+        </ui-prop>
         <div class="self-end layout center horizontal">
-            <ui-button id="uploadBtn" class="self-end green" v-on:confirm="onUploadBuglySymbol">上传符号表</ui-button>
+            <ui-button class="self-end red" v-on:confirm="onAddBuglySdk">添加Bugly</ui-button>
+            <ui-button id="uploadBtn" class="self-end green" v-on:confirm="onUploadBuglySymbol">生成符号表</ui-button>
         </div>
 
         <h2>日志:</h2>
         <textarea class="" id="logTextArea" v-value="logView" @contextmenu="onLogViewMenu"
-                  style="width: 100%; height: 200px; background: #252525;	color: #fd942b;	border-color: #fd942b;"></textarea>
+                  style="width: 100%; height: 520px; background: #252525;	color: #fd942b;	border-color: #fd942b;"></textarea>
     </div>
 </div>
