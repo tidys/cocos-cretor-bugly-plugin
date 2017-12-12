@@ -1,3 +1,5 @@
+## 注意
+- 仓库已经迁徙到https://github.com/tidys/CocosCreatorPlugins/tree/master/packages/plugin-bugly, 方便统一管理插件
 ## 腾讯bugly接入插件 
 - 插件开源地址: https://github.com/tidys/cocos-cretor-bugly-plugin
 - bugly官方文档: https://bugly.qq.com/docs/user-guide/instruction-manual-plugin-cocos/?v=20170912151050
